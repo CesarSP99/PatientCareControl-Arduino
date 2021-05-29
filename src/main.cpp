@@ -31,11 +31,14 @@ int avgIr;
 int avgTemp;
 int beatsok = 0;
 
-const String APIUrl = "";
+HTTPClient http;
+WiFiClient client;
+const String APIUrl = "http://52.152.220.15:8080/api/Lecturas";
+const int idPaciente = 1;
 
 void setupDateTime() {
-  DateTime.setServer("time.google.com");
-  DateTime.setTimeZone("UTC");
+  DateTime.setServer("pool.ntp.org");
+  DateTime.setTimeZone("UTC−04");
   DateTime.begin(5);
   if (!DateTime.isTimeValid()) {
     Serial.println("No se pudo obtener la fecha y hora del servidor");
@@ -82,22 +85,24 @@ void setup()
 }
 
 void mandarDatos(){
-  HTTPClient http;
-  WiFiClient client;
   http.begin(client, APIUrl);
   http.addHeader("Content-Type", "application/json");
   String datos;
   //TODO: Revisar el datetime
   StaticJsonDocument<96> doc;
-  doc["idPaciente"] = 1;
+
+  doc["idPaciente"] = idPaciente;
   doc["ritmoCardiaco"] = beatsPerMinute;
   doc["saturacionOxigeno"] = perCent;
-  doc["fechaMedicion"] = DateTime.toUTCString();
+  doc["fechaMedicion"] = DateTime.format("%FT%TZ");
+  doc["idPacienteNavigation"] = nullptr;
+
   serializeJson(doc, datos);
+  Serial.println("");
   Serial.println(datos);
-  // int respuesta = http.POST(datos);
+  int respuesta = http.POST(datos);
   // String payload = http.getString();
-  // Serial.print(respuesta);
+  Serial.print(respuesta);
   // Serial.println(": " + payload);
 }
 
