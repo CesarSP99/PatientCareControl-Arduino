@@ -88,7 +88,6 @@ void mandarDatos(){
   http.begin(client, APIUrl);
   http.addHeader("Content-Type", "application/json");
   String datos;
-  //TODO: Revisar el datetime
   StaticJsonDocument<96> doc;
 
   doc["idPaciente"] = idPaciente;
@@ -121,8 +120,6 @@ void loop()
     {
       rates[rateSpot++] = (byte)beatsPerMinute;
       rateSpot %= RATE_SIZE;
-
-      //Take average of readings
       beatAvg = 0;
       for (byte x = 0 ; x < RATE_SIZE ; x++)
         beatAvg += rates[x];
@@ -140,6 +137,9 @@ void loop()
 
   Serial.print(" ");
   perCent = irValue / irOffset;
+  if(perCent > 100){
+    perCent = 100;
+  }
   Serial.print("Oxygen=");
   Serial.print(perCent);
   Serial.print("%");
@@ -156,7 +156,7 @@ void loop()
   Serial.print(irValue);
 
   if (irValue < 50000) {
-    Serial.print(" No finger?");
+    Serial.print(" No hay dedo?");
     noFinger = noFinger+1;
   } else {
     count = count+1;
@@ -178,12 +178,10 @@ void loop()
     avgIr = 0;
     avgTemp = 0;
   }
-  //Si se encuentra un bpm aceptable, se toman 10 muestras y se manda
-  if(beatsPerMinute>=60){
+  //Si se encuentra un bpm aceptable, se toman 30 muestras y se manda
+  if(beatsPerMinute>=60 && perCent >= 50){
     beatsok++;
     if(beatsok == 30){  
-      if(perCent > 100)
-        perCent = 100;
       digitalWrite(LED_BUILTIN, HIGH);
       mandarDatos();
       delay(20000);
