@@ -33,8 +33,8 @@ int beatsok = 0;
 
 HTTPClient http;
 WiFiClient client;
-const String APIUrl = "http://52.152.220.15:8080/api/Lecturas";
-const int idPaciente = 1;
+const String APIUrl = "http://40.87.18.92:8080/api/Lecturas";
+const int idPaciente = 3;
 
 void setupDateTime() {
   DateTime.setServer("pool.ntp.org");
